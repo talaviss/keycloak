@@ -9,8 +9,11 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import javax.ws.rs.core.Response;
+import java.sql.Time;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 
 public class KeycloakAdminClientExample {
 
@@ -41,14 +44,16 @@ public class KeycloakAdminClientExample {
 //                .build();
 
         Keycloak kc = Keycloak.getInstance("http://localhost:8080/auth", "master", "admin", "Pa55w0rd", "admin-cli");
-
+        Random rnd = new Random(System.currentTimeMillis());
+        int id = rnd.nextInt();
+        String username ="tester" + id;
         // Define user
         UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
-        user.setUsername("tester1");
-        user.setFirstName("First");
-        user.setLastName("Last");
-        user.setEmail("tom+tester1@tdlabs.local");
+        user.setUsername(username);
+        user.setFirstName("First" + id);
+        user.setLastName("Last" + id);
+        user.setEmail("tom+tester" + id +"@tdlabs.local");
         user.setAttributes(Collections.singletonMap("origin", Arrays.asList("demo")));
 
         // Get realm
@@ -65,15 +70,18 @@ public class KeycloakAdminClientExample {
         System.out.printf("User created with userId: %s%n", userId);
 
         // Get realm role "tester" (requires view-realm role)
-        RoleRepresentation testerRealmRole = realmResource.roles()//
-                .get("tester1").toRepresentation();
-
+        RoleRepresentation kc1RealmRole = realmResource.roles()//
+                .get("kc-role1").toRepresentation();
+        RoleRepresentation kc2RealmRole = realmResource.roles()//
+                .get("kc-role2").toRepresentation();
+        RoleRepresentation kc3RealmRole = realmResource.roles()//
+                .get("kc-role3").toRepresentation();
         // Assign realm role tester to user
         userRessource.get(userId).roles().realmLevel() //
-                .add(Arrays.asList(testerRealmRole));
+                .add(Arrays.asList(kc1RealmRole, kc2RealmRole, kc3RealmRole));
 
         // Get client
-        ClientRepresentation app1Client = realmResource.clients() //
+       /* ClientRepresentation app1Client = realmResource.clients() //
                 .findByClientId("app-javaee-petclinic").get(0);
 
         // Get client level role (requires view-clients role)
@@ -91,7 +99,7 @@ public class KeycloakAdminClientExample {
         passwordCred.setValue("test");
 
         // Set password credential
-        userRessource.get(userId).resetPassword(passwordCred);
+        userRessource.get(userId).resetPassword(passwordCred);*/
 
     }
 }
